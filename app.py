@@ -6,7 +6,7 @@ import keras
 from keras.models import load_model
 import tensorflow as tf
 import werkzeug
-
+from flask import jsonify
 app = Flask(__name__)
 
 label_names = ["Bã rác","Rác hữu cơ","Thực vật","Túi lọc trà","Rác thực vật","Rác giấy","Chai kim loại","Chai thủy tinh","Chai nhựa","Giấy viết","Hộp giấy","Vật dụng bằng nhựa","Lon kim loại","Thùng carton","Bao bì sản phẩm","Bao nhựa","Rác nilon","Đồ gốm","Hộp xốp","Giấy ăn","Khẩu trang y tế","Ly giấy","Bóng đèn cũ","Pin"]
@@ -41,7 +41,6 @@ model.load_weights('model_weight.h5')
 
 from keras.preprocessing import image
 def load_image(img_path):
-
     img = image.load_img(img_path, target_size=(256, 256))
     img_tensor = image.img_to_array(img)                    # (height, width, channels)
     img_tensor = np.expand_dims(img_tensor, axis=0)         # (1, height, width, channels), add a dimension because the model expects this shape: (batch_size, height, width, channels)
@@ -52,13 +51,13 @@ def load_image(img_path):
 def handle_request():
     imagefile = flask.request.files['image']
     filename = werkzeug.utils.secure_filename(imagefile.filename)
-    new_image = load_image(path_demo)
+    print(filename)
+    new_image = load_image(filename)
     with graph.as_default():
         predictions =  model.predict(new_image)
     index = np.argmax(predictions[0])
     index_label = int(list(labels.keys())[list(labels.values()).index(index)])
-    print("Chi số trong vector: ", index_label)
-    print("Nhãn dự đoán: ", label_names[index_label])
-    return label_names[index_label]
+    output = "{label:"+str(label_names[index_label]) + "}"
+    return jsonify(output)
 
-app.run(host="0.0.0.0", port=5000, debug=True)
+app.run(debug=True)
