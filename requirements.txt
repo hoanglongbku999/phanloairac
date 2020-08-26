@@ -4,6 +4,6 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 MarkupSafe==1.1.1
 Werkzeug==0.15.5
-tensorflow==1.15.2
-keras==2.3.1
+tensorflow==1.15.0
+keras==2.2.5
 pillow
